@@ -1,0 +1,37 @@
+
+<style>
+button#cookie {
+    cursor: pointer;
+    font-size: 200px;
+}
+</style>
+<title>aklsfjaklsd</title>
+<h1>Cookie Clicker but Multiplayer</h1>
+<script>(async () =>  {
+const hashString = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
+let hashed = await hashString("Hello World");
+console.log(hashed);
+})();</script>
+
+<button id=cookie>Cookie 🍪</button>
+<!-- Cookie Clicker but Multiplayer -->
+<!-- Cookie Clicker but Multiplayer -->
+<!-- Cookie Clicker but Multiplayer -->
+<!-- Cookie Clicker but Multiplayer -->
+
+<!-- TODO: cookie image   ->
+<!-- TODO: build UI, cookie   ->
+<!-- TODO: game state with currnet cookie balance  ->
+<!-- TODO: array of rates of cookie production []
+<!-- TODO: tototalCookieVelocity  ->
+<!-- TODO: RATE LIMIT hash caching to prevent cheating  ->
+<!-- TODO: multiplayer with pubnub  ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
+<!-- TODO:   ->
