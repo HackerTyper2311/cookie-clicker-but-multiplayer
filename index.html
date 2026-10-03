@@ -1,12 +1,14 @@
 
 <style>
-button#cookie {
+div, button#cookie {
     cursor: pointer;
     font-size: 200px;
+    /*background-image: url(cookie.png);*/
 }
 </style>
 <title>Cookie Clicker but Multiplayer</title>
 <h1>Cookie Clicker but Multiplayer</h1>
+<button id=cookie>Cookie 🍪</button>
 <script>(async () =>  {
     const hashString = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -19,31 +21,68 @@ button#cookie {
         return count;
     }
     async function nonceFinder(difficulty=3) {
+        const uuid = crypto.randomUUID();
         let nonce = '';
         let count = 0;
         let hash = '';
+        let stringToSign = '';
+
         while (true) {
             nonce = rng();
-            hash = await hashString(nonce);
+            stringToSign = nonce + uuid;
+            hash = await hashString(stringToSign);
             count = countZeros(hash);
             if (count > difficulty) break;
         }
-        return hash;
+
+        return {
+            hash: hash,
+            nonce: nonce,
+            uuid: uuid,
+        };
     }
 
-    let start = +new Date;
-    let hash = await nonceFinder(4);
-    let end = +new Date;
-    console.log(hash);
-    console.log("Latency: ", end - start);
+    const hashCache = {};
+    async function verify(hashObj) {
+        const hash = hashObj.hash;
+        const nonce = hashObj.nonce;
+        const uuid = hashObj.uuid;
+
+        if (hash in hashCache) return false;
+
+        let stringToSign = nonce + uuid;
+        const hashToVerfiy = await hashString(stringToSign);
+        if (hash === hashToVerfiy) {
+            hashCache[hash] = true;
+            return true;
+        }
+        return false;
+    }
+
+    let cookie = document.getElementById("cookie");
+    cookie.addEventListener('mousedown', async (event) => {
+        console.log('clicked');
+        let start = +new Date;
+        let hash = await nonceFinder(4);
+        let end = +new Date;
+        console.log(hash);
+        console.log("Latency: ", end - start);
+
+        let verified = await verify(hash);
+        console.log(`Verified 1: ${verified}`);
+        verified = await verify(hash);
+        console.log(`Verified 2: ${verified}`);
+        verified = await verify(hash);
+        console.log(`Verified 3: ${verified}`);
+    });
 })();</script>
 
-<button id=cookie>Cookie 🍪</button>
 <!-- Cookie Clicker but Multiplayer -->
 <!-- Cookie Clicker but Multiplayer -->
 <!-- Cookie Clicker but Multiplayer -->
 <!-- Cookie Clicker but Multiplayer -->
 
+<!-- TODO: cookie image style chooser  -->
 <!-- TODO: cookie image   -->
 <!-- TODO: build UI, cookie   ->
 <!-- TODO: game state with currnet cookie balance  ->
