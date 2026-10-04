@@ -8,6 +8,11 @@ html {
     text-align: center;
 }
 </style>
+<!-- TODO localStorage for Hashes -->
+<!-- TODO fix main UI Thread freezjng issue -->
+<!-- TODO -->
+<!-- TODO -->
+<!-- TODO -->
 <title>Cookie Clicker but Multiplayer</title>
 <h1>Cookie Clicker but Multiplayer</h1>
 <h1 id=cookies>Cookies: 0<h1>
@@ -16,7 +21,7 @@ html {
 <script>(async () =>  {
     const cookieBalanceDisplay = document.querySelector('#cookies');
     let cookieBalance = getCookies();
-    const DIFFICULTY = 5;
+    const DIFFICULTY = 4;
     const COOKIE_CHANNEL = "Cookies";
     const hashString = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
