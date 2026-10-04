@@ -3,18 +3,32 @@
 div, button#cookie {
     cursor: pointer;
     font-size: 200px;
-    /*background-image: url(cookie.png);*/
+}
+html {
+    text-align: center;
 }
 </style>
 <title>Cookie Clicker but Multiplayer</title>
 <h1>Cookie Clicker but Multiplayer</h1>
+<h1 id=cookies>Cookies: 0<h1>
 <button id=cookie>Cookie 🍪</button>
+<script src=pubnub.js></script>
 <script>(async () =>  {
+    const cookieBalanceDisplay = document.querySelector('#cookies');
+    let cookieBalance = getCookies();
+    const DIFFICULTY = 4;
+    const COOKIE_CHANNEL = "Cookies";
     const hashString = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
     function rng() {
-        return (''+Math.random()) + (''+Math.random());
+        const buf = new Uint32Array(4);
+        crypto.getRandomValues(buf);
+        return Array.from(buf, x => x.toString(16).padStart(8, '0')).join('');
     }
+    /*
+    function rng() {
+        return (''+Math.random()) + (''+Math.random());
+    }*/
     function countZeros(hash) {
         let count = 0;
         while (hash[count++] == '0') continue; 
@@ -32,7 +46,7 @@ div, button#cookie {
             stringToSign = nonce + uuid;
             hash = await hashString(stringToSign);
             count = countZeros(hash);
-            if (count > difficulty) break;
+            if (count >= difficulty) break;
         }
 
         return {
@@ -47,7 +61,9 @@ div, button#cookie {
         const hash = hashObj.hash;
         const nonce = hashObj.nonce;
         const uuid = hashObj.uuid;
+        const count = countZeros(hash);
 
+        if (count < difficulty) return false;
         if (hash in hashCache) return false;
 
         let stringToSign = nonce + uuid;
@@ -59,11 +75,42 @@ div, button#cookie {
         return false;
     }
 
+    let pubnub = PubNub({
+        subscribeKey: 'demo',
+        publishKey: 'demo',
+    });
+
+    function addCookies(cookies=1) {
+        cookieBalance += cookies;
+        localStorage.setItem("cookies", cookieBalance);
+    }
+
+    function getCookies() {
+        return +localStorage.getItem("cookies") || 0;
+    }
+
+    function cookieClickTransmit(hash) {
+        pubnub.publish({
+            channel: COOKIE_CHANNEL,
+            message: hash,
+        });
+    }
+    async function cookieClickReceiver(message) {
+
+        let verified = await verify(hash);
+        console.log(`Cookie Click Verified: ${verified}`);
+    }
+
+    pubnub.subscribe({
+        channel: COOKIE_CHANNEL,
+        messages: cookieClickReceiver,
+    });
+
     let cookie = document.getElementById("cookie");
     cookie.addEventListener('mousedown', async (event) => {
         console.log('clicked');
         let start = +new Date;
-        let hash = await nonceFinder(4);
+        let hash = await nonceFinder(DIFFICULTY);
         let end = +new Date;
         console.log(hash);
         console.log("Latency: ", end - start);
