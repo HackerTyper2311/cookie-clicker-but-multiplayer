@@ -8,17 +8,23 @@ html {
     text-align: center;
 }
 </style>
+
+<!-- TODO different types of cookies and upgrades -->
+<!-- TODO versus game mode -->
+<!-- TODO tools: auto-generate cookie -->
+<!-- TODO names of people who clicked cookie -->
 <!-- TODO localStorage for Hashes -->
-<!-- TODO fix main UI Thread freezjng issue -->
-<!-- TODO -->
-<!-- TODO -->
-<!-- TODO -->
+<!-- ✅ TODO fix main UI Thread freezjng issue -->
+<!-- TODO organize code -->
 <title>Cookie Clicker but Multiplayer</title>
 <h1>Cookie Clicker but Multiplayer</h1>
-<h1 id=cookies>Cookies: 0<h1>
+<h1>🍪 <span id=cookies>0</span><h1>
 <button id=cookie>Cookie 🍪</button>
 <script src=pubnub.js></script>
+<!-- <script src=hash.js></script>
+<script src=app.js></script> -->
 <script>(async () =>  {
+    const hashCache = JSON.parse(localStorage.getItem("hashCache")||"{}");
     const cookieBalanceDisplay = document.querySelector('#cookies');
     let cookieBalance = getCookies();
     const DIFFICULTY = 4;
@@ -39,8 +45,11 @@ html {
         while (hash[count++] == '0') continue; 
         return count;
     }
-    async function nonceFinder(difficulty=3) {
+
+    async function nonceFinder(difficulty=3, callback=(()=>{})) {
+        const maxIterations = 250;
         const uuid = crypto.randomUUID();
+        let iterationCount = 0;
         let nonce = '';
         let count = 0;
         let hash = '';
@@ -52,16 +61,22 @@ html {
             hash = await hashString(stringToSign);
             count = countZeros(hash);
             if (count >= difficulty) break;
+            if (iterationCount++ >= maxIterations) return setTimeout(
+                () => nonceFinder(difficulty, callback),
+                10,
+            );
         }
 
-        return {
+        let bundle = {
             hash: hash,
             nonce: nonce,
             uuid: uuid,
-        };
+        }
+
+        callback(bundle);
+        return bundle;
     }
 
-    const hashCache = {};
     async function verify(hashObj) {
         const hash = hashObj.hash;
         const nonce = hashObj.nonce;
@@ -75,11 +90,13 @@ html {
         const hashToVerfiy = await hashString(stringToSign);
         if (hash === hashToVerfiy) {
             hashCache[hash] = true;
+            localStorage.getItem("hashCache", JSON.stringify(hashCache));
             return true;
         }
         return false;
     }
 
+    /*
     function getDay() {
         let day = new Date().getDay();
         switch (day) {
@@ -87,6 +104,7 @@ html {
             case 1: return 'Monday';
         }
     }
+    */
 
     let pubnub = PubNub({
         subscribeKey: 'demo',
@@ -95,7 +113,7 @@ html {
 
     function addCookies(cookies=1) {
         cookieBalance += cookies;
-        cookieBalanceDisplay.innerHTML = `Cookies: ${cookieBalance}`;
+        cookieBalanceDisplay.innerHTML = cookieBalance;
         localStorage.setItem("cookies", cookieBalance);
     }
 
@@ -124,13 +142,12 @@ html {
     cookie.addEventListener('mousedown', async (event) => {
         console.log('clicked');
         let start = +new Date;
-        let hash = await nonceFinder(DIFFICULTY);
-        let end = +new Date;
-        console.log(hash);
-        console.log("Latency: ", end - start);
-
-        // Send found solution to cookie hash
-        cookieClickTransmit(hash);
+        await nonceFinder(DIFFICULTY, hash => {
+            let end = +new Date;
+            console.log(hash);
+            console.log("Latency: ", end - start);
+            cookieClickTransmit(hash);
+        });
 
         /*
         let verified = await verify(hash);
