@@ -1,25 +1,58 @@
 
 <style>
-div, button#cookie {
+h1 {
+    background-color: rgba(255,255,255,0.8);
+    color: #1f1f00;
+    font-size: 50px;
+}
+button#cookie {
     cursor: pointer;
-    font-size: 200px;
+    font-size: 300px;
+    width: 400px;
+    border-radius: 500px;
+    border: 0;
+    background-color: rgba(255,255,215,0.3);
+}
+button#cookie:active {
+    transform: translate(2px, 7px) scale(1.3) rotate(6deg);
+    transition: all 0.1s ease;
 }
 html {
+    /* PRO_Stumblr thank you! */
+    /*background: url(table-cloth.jpg);*/
+    background: url(cookie.png); /* OmG-bt9rm thank you! */
+    background-color: lightblue;
     text-align: center;
+    /* ElLeonelGD thank you! */
+    font-family: 'Helvetica Neue';
+    font-weight: 200;
 }
 </style>
 
+<!-- TODO  https://popcat.click/ inspiration -->
+<!-- TODO  click anywhere to cookie -->
+<!-- TODO  add cookie crumb drops on cookie click Mikebloger -->
+<!-- TODO  cookie balance animates -->
+<!-- TODO  use different cookie skins for milestones -->
+<!-- TODO auto-clicker PRO_Stumblr -->
+<!-- TODO leaderboard PRO_Stumblr -->
+<!-- TODO achievements PRO_Stumblr -->
+<!-- TODO guy named kevin who gives you task every hour -->
+<!-- TODO shop for upgrades @fishflopper99 -->
+<!-- TODO  -->
+<!-- TODO  -->
+<!-- TODO Sound on click Crunch of the cookie -->
 <!-- TODO different types of cookies and upgrades -->
 <!-- TODO versus game mode -->
 <!-- TODO tools: auto-generate cookie -->
 <!-- TODO names of people who clicked cookie -->
-<!-- TODO localStorage for Hashes -->
+<!-- ✅ TODO localStorage for Hashes -->
 <!-- ✅ TODO fix main UI Thread freezjng issue -->
 <!-- TODO organize code -->
 <title>Cookie Clicker but Multiplayer</title>
 <h1>Cookie Clicker but Multiplayer</h1>
-<h1>🍪 <span id=cookies>0</span><h1>
-<button id=cookie>Cookie 🍪</button>
+<h1>🍪 <span id=cookies>0</span></h1>
+<button id=cookie>🍪</button>
 <script src=pubnub.js></script>
 <!-- <script src=hash.js></script>
 <script src=app.js></script> -->
@@ -31,15 +64,12 @@ html {
     const COOKIE_CHANNEL = "Cookies";
     const hashString = async s => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
+    // Gnomeskytarg thank you for fixing RNG
     function rng() {
         const buf = new Uint32Array(4);
         crypto.getRandomValues(buf);
         return Array.from(buf, x => x.toString(16).padStart(8, '0')).join('');
     }
-    /*
-    function rng() {
-        return (''+Math.random()) + (''+Math.random());
-    }*/
     function countZeros(hash) {
         let count = 0;
         while (hash[count++] == '0') continue; 
@@ -139,7 +169,8 @@ html {
     });
 
     let cookie = document.getElementById("cookie");
-    cookie.addEventListener('mousedown', async (event) => {
+    setInterval( click, 1000);
+    async function click(event) {
         console.log('clicked');
         let start = +new Date;
         await nonceFinder(DIFFICULTY, hash => {
@@ -148,16 +179,11 @@ html {
             console.log("Latency: ", end - start);
             cookieClickTransmit(hash);
         });
+    }
 
-        /*
-        let verified = await verify(hash);
-        console.log(`Verified 1: ${verified}`);
-        verified = await verify(hash);
-        console.log(`Verified 2: ${verified}`);
-        verified = await verify(hash);
-        console.log(`Verified 3: ${verified}`);
-        */
-    });
+
+
+    cookie.addEventListener('mousedown', click);
 })();</script>
 
 <!-- Cookie Clicker but Multiplayer -->
