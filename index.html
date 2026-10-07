@@ -9,6 +9,7 @@
 #cookies {
     color: #236890;
     transition: all 0.3s ease;
+    position: relative;
 }
 h1 {
     background-color: rgba(255,255,255,0.8);
@@ -108,6 +109,7 @@ body {
 /* * { margin: 0; padding: 0; box-sizing: border-box; } body { min-height: 100vh; background: linear-gradient(90deg, #ADD8E6 16px, #DDA0DD 16px, #DDA0DD 32px), linear-gradient(#ADD8E6 16px, #DDA0DD 16px, #DDA0DD 32px); background-size: 32px 32px; background-position: 0 0; image-rendering: pixelated; image-rendering: crisp-edges; }*/
 </style>
 
+<!-- TODO GOLDEN COOKIES!!!!! -->
 <!-- TODO add Twitch and Youtube Chat to change BG on valide HEX CODe -->
 <!-- TODO spin cookie while idle -->
 <!-- TODO  Pixelate the FONT -->
@@ -257,13 +259,14 @@ body {
     });
 
     function addCookies(cookies=1) {
-        cookies *= Math.round(cookieBalance / 1000000);
+        cookies *= 1 + Math.round(cookieBalance / 1000000);
         cookieBalance += cookies;
         // Round the cookies because cookies are round thank you @theavebel
         cookieBalance = Math.round(cookieBalance);
         cookieBalanceDisplay.innerHTML = cookieBalance;
         let rand = Math.random();
-        cookieBalanceDisplay.style.transform = `scale(${rand})`;
+        cookieBalanceDisplay.style.top = `${Math.random()*100}px`;
+        cookieBalanceDisplay.style.transform = `rotate(10.0deg)`;
         localStorage.setItem("cookies", cookieBalance);
     }
 
