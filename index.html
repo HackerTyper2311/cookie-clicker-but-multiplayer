@@ -1,6 +1,6 @@
 <style>
 #cookies {
-    transition: all 0.1s ease;
+    transition: all 0.3s ease;
 }
 h1 {
     background-color: rgba(255,255,255,0.8);
@@ -255,7 +255,7 @@ body {
         cookieBalance = Math.round(cookieBalance);
         cookieBalanceDisplay.innerHTML = cookieBalance;
         let rand = Math.random();
-        cookieBalanceDisplay.styles.transform = ``;
+        cookieBalanceDisplay.style.transform = `scale(${rand})`;
         localStorage.setItem("cookies", cookieBalance);
     }
 
